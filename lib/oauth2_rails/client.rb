@@ -38,11 +38,12 @@ module Oauth2Rails
 
     def refresh(refresh_token=@user.refresh_token)
       response = call(:post, "#{@token_path}?grant_type=refresh_token&refresh_token=#{refresh_token}")
-      @user.update_columns(
+      @user.attributes = {
         access_token: response.access_token,
         refresh_token: response.refresh_token,
         expiry: Time.now + response.expires_every
-      )
+      }
+      @user.save(:validate => false)
       @user
     end
 
